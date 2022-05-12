@@ -10,25 +10,56 @@ fn main(){
 ============================================================
 |                    Welcome Challenger!                   |
 |                                                          |
-|  The computer has generated a random number between      |
-|               1 (one) and 100 (hundred).                 |
-|                                                          |
-|   Try to guess the number before your lives run out.     |
+|       The computer has generated a random number.        |
+|   Try to guess the number before your chances run out.   |
 |                        Good luck!!                       |
-============================================================\n
-";
+============================================================";
     println!("{}",header);
-    // Start the game with a default number of rounds
-    let mut guesses: i32 = 6;
-    // Available game modes
-    let game_mode = ["normal", "hard"];
-    let mut selected_mode = game_mode[0];
-
 
     // Allow player to choose game mode
+    println!(
+"Please select a game mode:
+Normal - You get 6 guesses for a number between 0 and 100
+Advanced - You get 5 guesses for a number between 0 and 150
+
+Type 0 for Normal mode, and 1 for Advanced.
+Hit 'Enter' to skip selection. Default game mode will be Normal.
+    ");
+    // Create string to store user input for game mode
+    let mut player_mode = String::new();
     
-    let secret_number = rand::thread_rng().gen_range(1..101);
-    println!("The random number is {}", secret_number);
+    // read player input
+    io::stdin().read_line(&mut player_mode).expect("Failed to read line");
+    // parse input from string to integer32
+    let player_mode: u32 = match player_mode.trim().parse(){
+        Ok(num) => num,
+        Err(_) => 0,
+    };
+
+    // Start the game with a default number of guesse based on player input
+    let mut guesses: u32 = match player_mode {
+        0 => {
+            println!("selected NORMAL mode...Starting game...");
+            6
+        },
+        1 => {
+            println!("selected ADVANCED mode...Starting game...");
+            5
+        },
+        _ => {
+            println!("...Starting game...");
+            6
+        },
+    };
+
+    let end_range = match guesses {
+        5 => 151,
+        6 => 101,
+        _ => 101
+    };
+
+    let secret_number = rand::thread_rng().gen_range(1..end_range);
+    println!("The Secret number is between 0 and {}", end_range-1);
     
     // Print the number of tries the player has
     println!("You have {} guesses for this game", guesses);
@@ -49,19 +80,16 @@ fn main(){
         println!(
 "-------------------------"
         );
-        if selected_mode == game_mode[0] {
-            match guess.cmp(&secret_number) {
-                Ordering::Less => println!("Too small"),
-                Ordering::Equal =>{
-                    println!("You guessed right!");
-                    break;
-                } 
-                Ordering::Greater => println!("Too high")
+        
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too small"),
+            Ordering::Equal =>{
+                println!("YOU GUESSED RIGHT!");
+                break;
             }
-
-        } else {
-            println!("You selected hard game mode!");
+            Ordering::Greater => println!("Too high")
         }
+
         guesses -= 1;
         if guesses == 0 {
             let s: String = secret_number.to_string();
@@ -79,5 +107,5 @@ fn main(){
 "You have {} guesses left.
 -------------------------
         ", guesses);
-    }    
+    }
 }
