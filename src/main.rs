@@ -19,7 +19,7 @@ fn main(){
 ";
     println!("{}",header);
     // Start the game with a default number of rounds
-    let mut trials: i32 = 6;
+    let mut guesses: i32 = 6;
     // Available game modes
     let game_mode = ["normal", "hard"];
     let mut selected_mode = game_mode[0];
@@ -30,9 +30,11 @@ fn main(){
     let secret_number = rand::thread_rng().gen_range(1..101);
     println!("The random number is {}", secret_number);
     
-
+    // Print the number of tries the player has
+    println!("You have {} guesses for this game", guesses);
     loop {
         // Take guess as input
+        
         println!("Please input your guess. ");
         let mut guess = String::new();
 
@@ -44,9 +46,9 @@ fn main(){
             Ok(num) => num,
             Err(_) => continue,
         };
-        // Print out the player's guess.
-        println!("You guessed: {}", guess);
-
+        println!(
+"-------------------------"
+        );
         if selected_mode == game_mode[0] {
             match guess.cmp(&secret_number) {
                 Ordering::Less => println!("Too small"),
@@ -59,8 +61,23 @@ fn main(){
 
         } else {
             println!("You selected hard game mode!");
-        }    
+        }
+        guesses -= 1;
+        if guesses == 0 {
+            let s: String = secret_number.to_string();
+            println!("
+=========================================
+|   Sorry, You have run out of guesses. |
+|                                       |
+|   The hidden number was {}.           |
+|   Try again next time!                |
+=========================================", s
+        );
+            break;
+        };
+        println!(
+"You have {} guesses left.
+-------------------------
+        ", guesses);
     }    
 }
-
-fn check_guess() -> 
