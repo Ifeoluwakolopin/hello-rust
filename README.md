@@ -1,6 +1,6 @@
 # Guess The Number Game 🎮
 
-This CLI game allows a player to guess a randomly generated number within a given number of rounds.
+This simple game allows a player to guess a randomly generated number within a given number of rounds.
 
 The steps below allow you to download and run the source code on your local machine.
 
