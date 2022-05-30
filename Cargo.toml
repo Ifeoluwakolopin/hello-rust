@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 image = "0.23.14"
+
+[dev-dependencies]
+assert_cmd = "1"

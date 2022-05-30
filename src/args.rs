@@ -7,8 +7,7 @@ pub struct Args {
     // Paths to images passed as arguments
     pub image_1: String,
     pub image_2: String,
-    pub output: String
-
+    pub output: String,
 }
 
 impl Args {
@@ -16,7 +15,7 @@ impl Args {
         Args {
             image_1: get_nth_arg(1),
             image_2: get_nth_arg(2),
-            output: get_nth_arg(3)
+            output: get_nth_arg(3),
         }
     }
 }

@@ -1,9 +1,8 @@
 mod args;
 use args::Args;
-use image::{ io::Reader, DynamicImage, ImageFormat, GenericImageView, ImageError};
-use image::{ imageops::FilterType::Triangle };
-use std::{ convert::TryInto };
-
+use image::imageops::FilterType::Triangle;
+use image::{io::Reader, DynamicImage, GenericImageView, ImageError, ImageFormat};
+use std::convert::TryInto;
 
 #[derive(Debug)]
 enum ImageDataErrors {
@@ -12,8 +11,7 @@ enum ImageDataErrors {
     UnableToReadImageFromPath(std::io::Error),
     UnableToFormatImage(String),
     UnableToDecodeImage(ImageError),
-    UnableToSaveImage(ImageError)
-
+    UnableToSaveImage(ImageError),
 }
 
 struct FloatingImage {
@@ -27,12 +25,12 @@ impl FloatingImage {
     fn new(width: u32, height: u32, name: String) -> Self {
         let buffer_capacity = height * width * 4;
         let buffer = Vec::with_capacity(buffer_capacity.try_into().unwrap());
-        FloatingImage { 
+        FloatingImage {
             width,
             height,
             data: buffer,
             name,
-         }
+        }
     }
 
     fn set_data(&mut self, data: Vec<u8>) -> Result<(), ImageDataErrors> {
@@ -43,9 +41,7 @@ impl FloatingImage {
         self.data = data;
         Ok(())
     }
-
 }
-
 
 fn main() -> Result<(), ImageDataErrors> {
     let args = Args::new();
@@ -69,13 +65,12 @@ fn main() -> Result<(), ImageDataErrors> {
         output.width,
         output.height,
         image::ColorType::Rgba8,
-        image_format_1
+        image_format_1,
     ) {
         Err(ImageDataErrors::UnableToSaveImage(e))
     } else {
         Ok(())
     }
-    
 }
 
 fn find_image_from_path(path: String) -> Result<(DynamicImage, ImageFormat), ImageDataErrors> {
@@ -84,27 +79,24 @@ fn find_image_from_path(path: String) -> Result<(DynamicImage, ImageFormat), Ima
             if let Some(image_format) = image_reader.format() {
                 match image_reader.decode() {
                     Ok(image) => Ok((image, image_format)),
-                    Err(e) => Err(ImageDataErrors::UnableToDecodeImage(e))
+                    Err(e) => Err(ImageDataErrors::UnableToDecodeImage(e)),
                 }
             } else {
-                return Err(ImageDataErrors::UnableToFormatImage(path))
+                return Err(ImageDataErrors::UnableToFormatImage(path));
             }
-
-        },
-        Err(e) => Err(ImageDataErrors::UnableToReadImageFromPath(e))
+        }
+        Err(e) => Err(ImageDataErrors::UnableToReadImageFromPath(e)),
     }
 }
 
 fn get_smallest_dimension(dim_1: (u32, u32), dim_2: (u32, u32)) -> (u32, u32) {
     let pix_1 = dim_1.0 * dim_1.1;
-    let pix_2 = dim_2.0 *dim_2.1;
+    let pix_2 = dim_2.0 * dim_2.1;
     return if pix_1 < pix_2 { dim_1 } else { dim_2 };
 }
 
 fn standardize_size(image_1: DynamicImage, image_2: DynamicImage) -> (DynamicImage, DynamicImage) {
-    let (width, height) = get_smallest_dimension(
-        image_1.dimensions(), image_2.dimensions()
-    );
+    let (width, height) = get_smallest_dimension(image_1.dimensions(), image_2.dimensions());
     println!("Width: {}, Height: {}\n", width, height);
 
     if image_2.dimensions() == (width, height) {
@@ -121,21 +113,20 @@ fn combine_images(image_1: DynamicImage, image_2: DynamicImage) -> Vec<u8> {
     alternate_pixels(vector_1, vector_2)
 }
 
-fn alternate_pixels(vec_1:Vec<u8>, vec_2: Vec<u8>) -> Vec<u8> {
+fn alternate_pixels(vec_1: Vec<u8>, vec_2: Vec<u8>) -> Vec<u8> {
     let mut combined_data = vec![0u8; vec_1.len()];
 
     let mut i = 0;
 
     while i < vec_1.len() {
         if i % 8 == 0 {
-            combined_data.splice(i..=i+3, set_rgba(&vec_1, i, i+3));
+            combined_data.splice(i..=i + 3, set_rgba(&vec_1, i, i + 3));
         } else {
-            combined_data.splice(i..=i+3, set_rgba(&vec_2, i, i+3));
+            combined_data.splice(i..=i + 3, set_rgba(&vec_2, i, i + 3));
         }
         i += 4;
     }
     combined_data
-
 }
 
 fn set_rgba(vec: &Vec<u8>, start: usize, end: usize) -> Vec<u8> {
@@ -143,7 +134,7 @@ fn set_rgba(vec: &Vec<u8>, start: usize, end: usize) -> Vec<u8> {
     for idx in start..=end {
         let val = match vec.get(idx) {
             Some(d) => *d,
-            None => panic!("Index out of bounds")
+            None => panic!("Index out of bounds"),
         };
         rgba.push(val);
     }
